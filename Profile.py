@@ -101,6 +101,9 @@ class Profile:
         self.bio = bio            # OPTIONAL
         self._posts = []         # OPTIONAL
     
+    def __str__(self):
+        return f'Username: "{self.username}", Password: "{self.password}", Bio: "{self.bio}"'
+
     """
 
     add_post accepts a Post object as parameter and appends it to the posts list. Posts 
