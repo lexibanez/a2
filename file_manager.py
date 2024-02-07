@@ -89,10 +89,20 @@ def read_file(directory):
             with open(directory, 'r') as file:
                 content = file.read()
                 if not content:
-                    print("EMPTY")
+                    print("empty file")
                 else:
                     print(content.strip())
         else:
-            print("ERROR")
+            print("not a dsu file")
     else:
-        print("ERROR")
+        print("not a file")
+
+def open_dsu_file(directory):
+    if directory.is_file():
+        if directory.suffix == '.dsu':
+            with open(directory, 'r') as file:
+                print("file opened")
+        else:
+            print("not a .dsu file")
+    else:
+        print("could not open the file")
