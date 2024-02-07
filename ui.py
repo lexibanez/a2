@@ -11,9 +11,9 @@
 # testpath
 # C:\Users\lexib\OneDrive\Desktop\ICS32\a2tests
 
-from file_manager import list_directory, create_file, delete_file, read_file
+from file_manager import *
 from pathlib import Path
-from Profile import Profile, Post
+from Profile import Profile # add Post when needed
 
 
 def run_admin():
@@ -39,21 +39,44 @@ def run_admin():
 
         elif command.lower() == 'c':
 
-            dsu_path = create_file(directory, options)
+            try:
+                
+                try:
+                    dsu_path = create_file(directory, options)
 
-            username = str(input('Enter your username: '))
-            password = str(input('Enter your password: '))
-            bio = str(input('Enter your bio: '))
+                    username = str(input('Enter your username: '))
+                    password = str(input('Enter your password: '))
+                    bio = str(input('Enter your bio: '))
+                except Exception:
+                    print("could not make dsu file, please try again.")
 
-            profile = Profile(username, password, bio)
-            profile.save_profile(dsu_path)
+                else:
+                    user_profile = Profile(username, password, bio)
+                    user_profile.save_profile(dsu_path)
+                    print("dsu file created and currently open")
+                    edit_dsu_file(user_profile, dsu_path)
+            except TypeError:
+                print("could not make dsu file, please try again.")
+
+            
+            
 
         elif command.lower() == 'd':
             delete_file(directory)
 
         elif command.lower() == 'r':
             read_file(directory)
+        
+        elif command.lower() == 'o':
+            open_dsu_file(directory)
 
         else:
             print("Invalid command.")
             continue
+
+def run_user():
+    pass
+
+
+if __name__ == '__main__':
+    run_admin()
