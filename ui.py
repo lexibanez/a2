@@ -13,7 +13,7 @@
 
 from file_manager import *
 from pathlib import Path
-from Profile import Profile # add Post when needed
+from Profile import Profile
 
 
 def run_admin():
@@ -51,16 +51,14 @@ def run_admin():
                     print("could not make dsu file, please try again.")
 
                 else:
-                    user_profile = Profile(username, password, bio)
-                    user_profile.save_profile(dsu_path)
+                    journal = Profile(username, password, bio)
+                    journal.save_profile(dsu_path)
                     print("dsu file created and currently open")
-                    edit_dsu_file(user_profile, dsu_path)
+                    edit_dsu_file(journal, dsu_path)
             except TypeError:
                 print("could not make dsu file, please try again.")
 
             
-            
-
         elif command.lower() == 'd':
             delete_file(directory)
 
@@ -74,7 +72,8 @@ def run_admin():
             print("Invalid command.")
             continue
 
-def run_user():
+
+def run_user(): # TODO
     pass
 
 

@@ -1,5 +1,5 @@
 from pathlib import Path
-from Profile import Profile
+from Profile import Profile, Post
 import json
 
 def get_last_option(options):
@@ -103,16 +103,16 @@ def open_dsu_file(directory):
     if directory.is_file():
         if directory.suffix == '.dsu':
             print("file opened")
-            user_profile = Profile() # instantiate a new profile object
-            user_profile.load_profile(directory) # load the profile from the file system into the object
-            edit_dsu_file(user_profile, directory) # send to editor function
+            journal = Profile() # instantiate a new profile object
+            journal.load_profile(directory) # load the profile from the file system into the object
+            edit_dsu_file(journal, directory) # send to editor function
         else:
             print("not a .dsu file")
     else:
         print("could not open the file")
     
 
-def edit_dsu_file(user_profile: Profile, dsu_path: str):
+def edit_dsu_file(journal: Profile, dsu_path: str):
 
     while True:
         print("currently editing opened file, please enter an editing command, or Q to quit editing")
@@ -124,18 +124,39 @@ def edit_dsu_file(user_profile: Profile, dsu_path: str):
         
         elif command.lower() == 'e':
             if '-usr' in args:
-                username = args[args.index('-usr') + 1]
-                user_profile.username = username
-                user_profile.save_profile(dsu_path)
-            elif '-pwd' in args:
-                pwd = args[args.index('-pwd') + 1]
-                user_profile.password = pwd
-                user_profile.save_profile(dsu_path)
-            elif '-bio' in args:
-                bio = args[args.index('-bio') + 1]
-                user_profile.bio = bio
-                user_profile.save_profile(dsu_path)
-            elif '-addpost' in args:
-                pass
-            elif '-delpost' in args:
-                pass
+                username = get_argument_value(args, '-usr')
+                journal.username = username
+                journal.save_profile(dsu_path)
+            if '-pwd' in args:
+                pwd = get_argument_value(args, '-pwd')
+                journal.password = pwd
+                journal.save_profile(dsu_path)
+            if '-bio' in args:
+                bio = get_argument_value(args, '-bio')
+                journal.bio = bio
+                journal.save_profile(dsu_path)
+            if '-addpost' in args:
+                post_content = get_argument_value(args, '-addpost')
+                post = Post(post_content)
+                journal.add_post(post)
+                journal.save_profile(dsu_path)
+            if '-delpost' in args:
+                get_posts(journal)
+                index = int(input("Enter the index of the post you want to delete: "))
+                journal.del_post(index)
+            
+            
+def get_argument_value(args, command): # get the value of the argument after the "-xxx" command including spaces
+    if command in args:
+        start_index = args.index(command) + 1
+        end_index = next((i for i, arg in enumerate(args[start_index:], start=start_index) if arg.startswith('-')), len(args))
+        return ' '.join(args[start_index:end_index])
+    else:
+        return None
+
+def get_posts(journal):
+    posts = journal.get_posts()
+    i = 0
+    for post in posts:
+        print(f'{i}: {post["entry"]}')
+        i += 1
