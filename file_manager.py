@@ -115,8 +115,8 @@ def open_dsu_file(directory):
 def edit_dsu_file(journal: Profile, dsu_path: str):
 
     while True:
-        print("currently editing opened file, please enter an editing command, or Q to quit editing")
-        user_input = input("Enter a profile editing command: ")
+        print("currently editing opened file, please enter a journal command, or 'Q' to close journal")
+        user_input = input("Enter a journal command: ")
         command, *args = user_input.split()
 
         if command.lower() == 'q':
@@ -144,8 +144,25 @@ def edit_dsu_file(journal: Profile, dsu_path: str):
                 get_posts(journal)
                 index = int(input("Enter the index of the post you want to delete: "))
                 journal.del_post(index)
-            
-            
+                ### TODO fix this to meet requirements, add P functionality
+        
+        elif command.lower() == 'p':
+            if '-usr' in args:
+                print(journal.username)
+            if '-pwd' in args:
+                print(journal.password)
+            if '-bio' in args:
+                print(journal.bio)
+            if '-posts' in args:
+                get_posts(journal)
+            if '-post' in args:
+                id = get_argument_value(args, '-post')
+                print(journal.get_posts()[int(id)]["entry"])
+            if '-all' in args:
+                print(journal.__str__())
+                get_posts(journal)
+
+
 def get_argument_value(args, command): # get the value of the argument after the "-xxx" command including spaces
     if command in args:
         start_index = args.index(command) + 1
