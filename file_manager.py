@@ -1,6 +1,5 @@
 from pathlib import Path
 from Profile import Profile, Post
-import json
 
 def get_last_option(options):
     if len(options) == 3:
@@ -102,65 +101,66 @@ def read_file(directory):
 def open_dsu_file(directory):
     if directory.is_file():
         if directory.suffix == '.dsu':
-            print("file opened")
             journal = Profile() # instantiate a new profile object
             journal.load_profile(directory) # load the profile from the file system into the object
-            edit_dsu_file(journal, directory) # send to editor function
+            print("Journal opened")
+            return journal
         else:
-            print("not a .dsu file")
+            raise Exception("not a .dsu file")
     else:
-        print("could not open the file")
+        raise Exception("could not open the file")
     
 
-def edit_dsu_file(journal: Profile, dsu_path: str):
+def edit_dsu_file(journal: Profile, dsu_path: str, command=None, args=None):
 
-    while True:
-        print("currently editing opened file, please enter a journal command, or 'Q' to close journal")
-        user_input = input("Enter a journal command: ")
-        command, *args = user_input.split()
+    if command.lower() == 'q':
+        return
+        
+    elif command.lower() == 'e':
+        if '-usr' in args:
+            username = get_argument_value(args, '-usr')
+            journal.username = username
+            journal.save_profile(dsu_path)
+        if '-pwd' in args:
+            pwd = get_argument_value(args, '-pwd')
+            journal.password = pwd
+            journal.save_profile(dsu_path)
+        if '-bio' in args:
+            bio = get_argument_value(args, '-bio')
+            journal.bio = bio
+            journal.save_profile(dsu_path)
+        if '-addpost' in args:
+            post_content = get_argument_value(args, '-addpost')
+            post = Post(post_content)
+            journal.add_post(post)
+            journal.save_profile(dsu_path)
+        if '-delpost' in args:
+            for arg in args:
+                if arg.isdigit():
+                    index = int(arg)
+                    break
+            journal.del_post(index)
+            journal.save_profile(dsu_path)
 
-        if command.lower() == 'q':
-            break
+        return
         
-        elif command.lower() == 'e':
-            if '-usr' in args:
-                username = get_argument_value(args, '-usr')
-                journal.username = username
-                journal.save_profile(dsu_path)
-            if '-pwd' in args:
-                pwd = get_argument_value(args, '-pwd')
-                journal.password = pwd
-                journal.save_profile(dsu_path)
-            if '-bio' in args:
-                bio = get_argument_value(args, '-bio')
-                journal.bio = bio
-                journal.save_profile(dsu_path)
-            if '-addpost' in args:
-                post_content = get_argument_value(args, '-addpost')
-                post = Post(post_content)
-                journal.add_post(post)
-                journal.save_profile(dsu_path)
-            if '-delpost' in args:
-                get_posts(journal)
-                index = int(input("Enter the index of the post you want to delete: "))
-                journal.del_post(index)
-                ### TODO fix this to meet requirements, add P functionality
-        
-        elif command.lower() == 'p':
-            if '-usr' in args:
-                print(journal.username)
-            if '-pwd' in args:
-                print(journal.password)
-            if '-bio' in args:
-                print(journal.bio)
-            if '-posts' in args:
-                get_posts(journal)
-            if '-post' in args:
-                id = get_argument_value(args, '-post')
-                print(journal.get_posts()[int(id)]["entry"])
-            if '-all' in args:
-                print(journal.__str__())
-                get_posts(journal)
+    elif command.lower() == 'p':
+        if '-usr' in args:
+            print(f'Your username is {journal.username}\n')
+        if '-pwd' in args:
+            print(f'Your password is {journal.password}\n')
+        if '-bio' in args:
+            print(f'Your bio is {journal.bio}\n')
+        if '-posts' in args:
+            get_all_posts(journal)
+        if '-post' in args:
+            id = get_argument_value(args, '-post')
+            print(journal.get_posts()[int(id)]["entry"])
+        if '-all' in args:
+            print(journal.__str__())
+            get_all_posts(journal)
+
+        return
 
 
 def get_argument_value(args, command): # get the value of the argument after the "-xxx" command including spaces
@@ -171,7 +171,7 @@ def get_argument_value(args, command): # get the value of the argument after the
     else:
         return None
 
-def get_posts(journal):
+def get_all_posts(journal):
     posts = journal.get_posts()
     i = 0
     for post in posts:
