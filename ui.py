@@ -13,13 +13,14 @@ from Profile import Profile
 def run_admin():
 
     while True:
+        print("currently in admin mode.")
         while True:
             user_input = input()
             if user_input:
                 command, *args = user_input.split()
                 break
             else:
-                print("ERROR")
+                print("no input")
 
         if command.lower() == 'q':
             break
@@ -31,29 +32,42 @@ def run_admin():
             directory = Path(args[0])
 
         if command.lower() == 'l':
-            if directory.is_dir():
-                list_directory(directory, options)
-            else:
-                print('Could not find directory.')
+            try:
+                if directory.is_dir():
+                    list_directory(directory, options)
+                else:
+                    print('could not find directory.')
+            except UnboundLocalError:
+                print("please provide a directory")
+                continue
 
         elif command.lower() == 'c':
-
+        
             try:
-                
                 try:
-                    username = str(input('Enter your username: '))
-                    password = str(input('Enter your password: '))
-                    bio = str(input('Enter your bio: '))
+                    print('Enter your username: ', end='')
+                    username = str(input())
+                    print('Enter your password: ', end='')
+                    password = str(input())
+                    print('Enter your bio: ', end='')
+                    bio = str(input())
 
-                    dsu_path = create_file(directory, options)
                 except Exception:
                     print("could not make dsu file, please try again.")
+                
+                if (directory / (args[2] + '.dsu')).exists():
+                    print("File already exists, opening file.")
+                    journal = open_dsu_file(directory / (args[2] + '.dsu'))
+                    journal.save_profile(directory / (args[2] + '.dsu'))
+                    admin_mode(journal, (directory / (args[2] + '.dsu')))
 
-                else:
+                if not (directory / (args[2] + '.dsu')).exists():
+                    dsu_path = create_file(directory, options)
                     journal = Profile(username, password, bio)
                     journal.save_profile(dsu_path)
                     print("dsu file created and currently open")
                     admin_mode(journal, dsu_path)
+
             except TypeError:
                 print("could not make dsu file, please try again.")
 
@@ -64,23 +78,24 @@ def run_admin():
         elif command.lower() == 'r':
             read_file(directory)
         
-        elif command.lower() == 'o': ##TODO FIX ADMIN MODE
+        elif command.lower() == 'o':
             try:
                 journal = open_dsu_file(directory)
                 journal.save_profile(directory)
-            except Exception:
-                print("ERROR")
+            except Exception as e:
+                print(e)
                 continue
 
             admin_mode(journal, directory) # send to editor function
 
         else:
-            print("ERROR")
+            print("invalid command")
             continue
 
 
 edit_menu_options_list = ['-usr', '-pwd', '-bio', '-addpost', '-delpost']
 print_menu_options_list = ['-usr', '-pwd', '-bio', '-posts', '-post', '-all']
+
 
 def run_ui(option):
 
