@@ -172,7 +172,8 @@ def get_argument_value(args, command): # get the value of the argument after the
     if command in args:
         start_index = args.index(command) + 1
         end_index = next((i for i, arg in enumerate(args[start_index:], start=start_index) if arg.startswith('-')), len(args))
-        return ' '.join(args[start_index:end_index])
+        value = ' '.join(args[start_index:end_index])
+        return value.strip('\'"') # strip single and double quotes from the start and end of the value
     else:
         return None
 

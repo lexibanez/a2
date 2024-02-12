@@ -1,5 +1,4 @@
 from file_manager import get_argument_value, get_all_posts
-from pathlib import Path
 from Profile import Profile, Post
 
 def admin_mode(journal: Profile, dsu_path: str):

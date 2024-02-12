@@ -46,10 +46,21 @@ def run_admin():
         
             try:
                 try:
-                    print('Enter your username: ', end='')
-                    username = str(input())
-                    print('Enter your password: ', end='')
-                    password = str(input())
+                    while True:
+                        print('Enter your username: ', end='')
+                        username = str(input()).strip()
+                        if ' ' in username:
+                            print('Username cannot contain spaces')
+                            continue
+
+                        print('Enter your password: ', end='')
+                        password = str(input()).strip()
+                        if ' ' in password:
+                            print('Password cannot contain spaces')
+                            continue
+
+                        break
+
                     print('Enter your bio: ', end='')
                     bio = str(input())
 
@@ -111,9 +122,21 @@ def run_ui(option):
 
             if directory.is_dir():
                 try:
-                    username = str(input('Enter your username: '))
-                    password = str(input('Enter your password: '))
-                    bio = str(input('Enter your bio: '))
+                    while True:
+                        print('Enter your username: ', end='')
+                        username = str(input()).strip()
+                        if ' ' in username:
+                            print('Username cannot contain spaces')
+                            continue
+
+                        print('Enter your password: ', end='')
+                        password = str(input()).strip()
+                        if ' ' in password:
+                            print('Password cannot contain spaces')
+                            continue
+
+                        break
+                    bio = str(input('Enter your bio: ')).strip('\'"')
                     file_name = str(input('Enter a name for the DSU file: '))
                         
                 except Exception:
@@ -198,7 +221,7 @@ def run_ui(option):
                 args = []
                 
                 if command == "e":
-                    print(f"\n\nYou are now editing {directory.name}, please enter an editing command")
+                    print(f"\nYou are now editing {directory.name}, please enter an editing command")
                     edit_menu_options()
                     option = input("Enter a command: ")
                     while option not in edit_menu_options_list:
@@ -211,7 +234,7 @@ def run_ui(option):
                     args.append(option_input)
                 
                 elif command == "p":
-                    print(f"You are now looking at {directory.name}, please enter an print command")
+                    print(f"\nYou are now looking at {directory.name}, please enter an print command")
                     print_menu_options()
                     option = input("Enter a command: ")
                     while option not in print_menu_options_list:
@@ -257,9 +280,21 @@ def print_menu_options():
 
 def handle_edit_options(option, journal):
     if option == '-usr':
-        return input("Enter your new username: ")
+        while True:
+            username = input("Enter your new username: ").strip()
+            if ' ' in username:
+                print('Username cannot contain spaces')
+            else:
+                break
+        return username
     if option == '-pwd':
-        return input("Enter your new password: ")
+        while True:
+            password = input("Enter your new password: ").strip()
+            if ' ' in password:
+                print('Password cannot contain spaces')
+            else:
+                break
+        return password
     if option == '-bio':
         return input("Enter your new bio: ")
     if option == '-addpost':
