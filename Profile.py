@@ -106,7 +106,7 @@ class Profile:
         self._posts = []         # OPTIONAL
     
     def __str__(self):
-        return f'Username: "{self.username}", Password: "{self.password}", Bio: "{self.bio}"'
+        return f'Username: {self.username}, Password: {self.password}, Bio: {self.bio}'
 
     """
 
