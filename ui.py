@@ -62,7 +62,7 @@ def run_admin():
                         break
 
                     print('Enter your bio: ', end='')
-                    bio = str(input())
+                    bio = str(input()).strip('\'"')
 
                 except Exception:
                     print("could not make dsu file, please try again.")
@@ -125,20 +125,29 @@ def run_ui(option):
                     while True:
                         print('Enter your username: ', end='')
                         username = str(input()).strip()
-                        if ' ' in username:
-                            print('Username cannot contain spaces')
+                        status = check_input(username)
+                        if status == False: # check if the username is valid
                             continue
 
                         print('Enter your password: ', end='')
                         password = str(input()).strip()
-                        if ' ' in password:
-                            print('Password cannot contain spaces')
+                        status2 = check_input(password) # check if the password is valid
+                        if status2 == False:
                             continue
-
+                        break # if both username and password are valid, break out of the loop
+                    while True:
+                        bio = str(input('Enter your bio: ')).strip('\'"')
+                        status = check_spaces(bio)
+                        if status == False:
+                            continue
                         break
-                    bio = str(input('Enter your bio: ')).strip('\'"')
-                    file_name = str(input('Enter a name for the DSU file: '))
-                        
+                    while True:
+                        file_name = str(input('Enter a name for the DSU file: ')).strip()
+                        status = check_input(file_name)
+                        if status == False:
+                            continue
+                        break
+
                 except Exception:
                     print("Could not make dsu file, please try again.")
                     break
@@ -282,27 +291,50 @@ def handle_edit_options(option, journal):
     if option == '-usr':
         while True:
             username = input("Enter your new username: ").strip()
-            if ' ' in username:
-                print('Username cannot contain spaces')
-            else:
-                break
+            status = check_input(username)
+            if status == False:
+                continue
+            break
         return username
     if option == '-pwd':
         while True:
             password = input("Enter your new password: ").strip()
-            if ' ' in password:
-                print('Password cannot contain spaces')
-            else:
-                break
+            status = check_input(password)
+            if status == False:
+                continue
+            break
         return password
     if option == '-bio':
-        return input("Enter your new bio: ")
+        while True:
+            bio = input("Enter your new bio: ").strip()
+            if bio == '':
+                print('Bio cannot be empty')
+                continue
+            if bio.isspace():
+                print('Bio cannot be only spaces')
+                continue
+            break
+        return bio
     if option == '-addpost':
-        return input("Enter a post: ")
+        while True:
+            post_content = input("Enter the content of your post: ")
+            status = check_spaces(post_content)
+            if status == False:
+                continue
+            break
+        return post_content
     if option == '-delpost':
-        get_all_posts(journal)
-        id = input("Enter the id of the post you would like to delete: ")
-        return id
+        while True:
+            get_all_posts(journal)
+            id = input("Enter the id of the post you would like to delete: ")
+            if not id.isdigit():
+                print("ID must be a number")
+                continue
+            status = check_input(id)
+            if status == False:
+                continue
+            break
+        return int(id)
 
 def handle_print_options(option,journal):
     if option == '-usr':
@@ -314,8 +346,16 @@ def handle_print_options(option,journal):
     if option == '-posts':
         return
     if option == '-post':
-        get_post_indexes_only(journal)
-        id = input("Enter the id of the post you would like to view: ")
+        while True:
+            get_post_indexes_only(journal)
+            id = input("Enter the id of the post you would like to view: ")
+            status = check_input(id)
+            if status == False:
+                continue
+            elif not id.isdigit():
+                print("Post id must be a number")
+                continue
+            break
         return id
     if option == '-all':
         return

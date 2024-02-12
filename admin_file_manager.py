@@ -1,4 +1,4 @@
-from file_manager import get_argument_value, get_all_posts
+from file_manager import get_argument_value, get_all_posts, check_input, check_spaces
 from Profile import Profile, Post
 
 def admin_mode(journal: Profile, dsu_path: str):
@@ -10,26 +10,38 @@ def admin_mode(journal: Profile, dsu_path: str):
                 command, *args = user_input.split()
                 break
             else:
-                print("enter a dsu.file")
+                print("enter a dsu file")
 
         if command.lower() == 'q':
             break
-        
+
         elif command.lower() == 'e':
             if '-usr' in args:
                 username = get_argument_value(args, '-usr')
+                status = check_input(username)
+                if status == False:
+                    continue
                 journal.username = username
                 journal.save_profile(dsu_path)
             if '-pwd' in args:
                 pwd = get_argument_value(args, '-pwd')
+                status = check_input(pwd)
+                if status == False:
+                    continue
                 journal.password = pwd
                 journal.save_profile(dsu_path)
             if '-bio' in args:
                 bio = get_argument_value(args, '-bio')
+                status = check_spaces(bio)
+                if status == False:
+                    continue
                 journal.bio = bio
                 journal.save_profile(dsu_path)
             if '-addpost' in args:
                 post_content = get_argument_value(args, '-addpost')
+                status = check_spaces(post_content)
+                if status == False:
+                    continue
                 post = Post(post_content)
                 journal.add_post(post)
                 journal.save_profile(dsu_path)
@@ -53,12 +65,12 @@ def admin_mode(journal: Profile, dsu_path: str):
                     if id:
                         print(journal.get_posts()[int(id)]["entry"])
                     else:
-                        print("Provide a number")
+                        print("provide a number")
                 except IndexError or ValueError:
-                    print("Index out of range")
+                    print("index out of range")
                     continue
             if '-all' in args:
                 print(journal.__str__())
                 get_all_posts(journal)
         else:
-            print("ERROR")
+            print("not a command")

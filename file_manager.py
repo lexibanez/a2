@@ -183,3 +183,24 @@ def get_all_posts(journal):
     for post in posts:
         print(f'{i}: {post["entry"]}\nTimestamp: {post["timestamp"]}')
         i += 1
+
+def check_spaces(input):
+    if input.isspace():
+        print('Input cannot be only spaces')
+        return False
+    if input == '':
+        print('Input cannot be empty')
+        return False
+    return True
+
+def check_input(input):
+    if input == '':
+        print('Input cannot be empty')
+        return False
+    if ' ' in input:
+        print('Input cannot contain spaces')
+        return False
+    if input.isspace():
+        print('Input cannot be only spaces')
+        return False
+    return True
