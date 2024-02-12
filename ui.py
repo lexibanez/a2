@@ -74,8 +74,9 @@ def run_ui(option):
                 elif (directory / (file_name + '.dsu')).exists():
                     print("File already exists, opening file.")
                     try:
-                        journal = open_dsu_file(directory / (file_name + '.dsu'))
+                        journal = open_dsu_file(directory/(file_name + '.dsu'))
                         journal.save_profile(directory / (file_name + '.dsu'))
+                        dsu_path = directory / (file_name + '.dsu')
                     except Exception:
                         break
 
@@ -84,11 +85,11 @@ def run_ui(option):
                           " please enter a journal command, "
                           "or 'Q' to close journal")
                     journal_menu_options()
-                    command = input("Enter command: ").lower()
+                    command = input("Enter command: ").lower().strip()
                     while command not in ["e", "p", "q"]:
                         print("Invalid command, please try again.")
                         journal_menu_options()
-                        command = input("Enter command: ").lower()
+                        command = input("Enter command: ").lower().strip()
 
                     args = []
 
@@ -145,11 +146,11 @@ def run_ui(option):
                 print(f"\nCurrently looking at {directory.name}, please "
                       "enter a journal command, or 'Q' to close journal")
                 journal_menu_options()
-                command = input("Enter command: ").lower()
+                command = input("Enter command: ").lower().strip()
                 while command not in ["e", "p", "q"]:
                     print("Invalid command, please try again.")
                     journal_menu_options()
-                    command = input("Enter command: ").lower()
+                    command = input("Enter command: ").lower().strip()
 
                 args = []
 
