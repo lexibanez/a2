@@ -1,3 +1,7 @@
+# Lex Ibanez
+# laibanez@uci.edu
+# 70063614
+
 # Profile.py
 #
 # ICS 32
