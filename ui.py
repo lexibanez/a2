@@ -73,8 +73,11 @@ def run_ui(option):
                 # if the file exists, open it
                 elif (directory / (file_name + '.dsu')).exists():
                     print("File already exists, opening file.")
-                    journal = open_dsu_file(directory / (file_name + '.dsu'))
-                    journal.save_profile(directory / (file_name + '.dsu'))
+                    try:
+                        journal = open_dsu_file(directory / (file_name + '.dsu'))
+                        journal.save_profile(directory / (file_name + '.dsu'))
+                    except Exception:
+                        break
 
                 while True:
                     print(f"\nCurrently looking at {file_name}.dsu,"

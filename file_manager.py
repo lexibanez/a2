@@ -3,7 +3,7 @@
 # 70063614
 
 from pathlib import Path
-from Profile import Profile, Post
+from Profile import Profile, Post, DsuProfileError
 
 def get_last_option(options):
     if len(options) == 3:
@@ -105,9 +105,13 @@ def read_file(directory):
 def open_dsu_file(directory):
     if directory.is_file():
         if directory.suffix == '.dsu':
-            journal = Profile() # instantiate a new profile object
-            journal.load_profile(directory) # load the profile from the file system into the object
-            return journal
+            try:
+                journal = Profile() # instantiate a new profile object
+                journal.load_profile(directory) # load the profile from the file system into the object
+                return journal
+            except DsuProfileError:
+                print("File does not follow Profile format.")
+                raise Exception
         else:
             raise Exception("not a .dsu file")
     else:
@@ -168,12 +172,14 @@ def edit_dsu_file(journal: Profile, dsu_path: str, command=None, args=None):
 
         return
 
-def get_argument_value(args, command): # get the value of the argument after the "-xxx" command including spaces
+# get the value of the argument after the "-xxx" command including spaces
+def get_argument_value(args, command): 
     if command in args:
         start_index = args.index(command) + 1
         end_index = next((i for i, arg in enumerate(args[start_index:], start=start_index) if arg.startswith('-')), len(args))
         value = ' '.join(args[start_index:end_index])
-        return value.strip('\'"') # strip single and double quotes from the start and end of the value
+        # get the value of the argument after the "-xxx" command including spaces
+        return value.strip('\'"') 
     else:
         return None
 

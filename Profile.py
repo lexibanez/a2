@@ -193,6 +193,8 @@ class Profile:
             try:
                 f = open(p, 'r')
                 obj = json.load(f)
+                if not all(key in obj for key in ['username', 'password', 'dsuserver', 'bio', '_posts']):
+                    raise DsuProfileError("Invalid DSU file")
                 self.username = obj['username']
                 self.password = obj['password']
                 self.dsuserver = obj['dsuserver']
