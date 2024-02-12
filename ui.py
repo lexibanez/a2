@@ -1,9 +1,3 @@
-# ui.py
-
-# Starter code for assignment 2 in ICS 32 Programming with Software Libraries in Python
-
-# Replace the following placeholders with your information.
-
 # Lex Ibanez
 # laibanez@uci.edu
 # 70063614
@@ -19,12 +13,17 @@ from Profile import Profile
 def run_admin():
 
     while True:
-        user_input = input()
-        command, *args = user_input.split()
+        while True:
+            user_input = input()
+            if user_input:
+                command, *args = user_input.split()
+                break
+            else:
+                print("ERROR")
 
         if command.lower() == 'q':
             break
-
+        
         options = []
         if len(args) > 1:
             options = args
@@ -54,7 +53,7 @@ def run_admin():
                     journal = Profile(username, password, bio)
                     journal.save_profile(dsu_path)
                     print("dsu file created and currently open")
-                    edit_dsu_file(journal, dsu_path)
+                    admin_mode(journal, dsu_path)
             except TypeError:
                 print("could not make dsu file, please try again.")
 
@@ -66,26 +65,32 @@ def run_admin():
             read_file(directory)
         
         elif command.lower() == 'o': ##TODO FIX ADMIN MODE
-            while True:
-                try:
-                    journal = open_dsu_file(directory)
-                    journal.save_profile(directory)
-                    break
-                except Exception:
-                    print("ERROR")
-            edit_dsu_file(journal, directory) # send to editor function
+            try:
+                journal = open_dsu_file(directory)
+                journal.save_profile(directory)
+            except Exception:
+                print("ERROR")
+                continue
+
+            admin_mode(journal, directory) # send to editor function
 
         else:
-            print("Invalid command.")
+            print("ERROR")
             continue
 
 
+edit_menu_options_list = ['-usr', '-pwd', '-bio', '-addpost', '-delpost']
+print_menu_options_list = ['-usr', '-pwd', '-bio', '-posts', '-post', '-all']
+
 def run_ui(option):
 
+    quit_flag = False
+
     while True:
-        
+        if quit_flag:
+            return
+
         if option.lower() == 'c':
-            print("Great! Let's create a new DSU file.")
             directory = Path(input("Enter the directory where you would like to create the file: "))
 
             if directory.is_dir():
@@ -94,61 +99,67 @@ def run_ui(option):
                     password = str(input('Enter your password: '))
                     bio = str(input('Enter your bio: '))
                     file_name = str(input('Enter a name for the DSU file: '))
-                    dsu_path = create_file(directory, ['-n', file_name])
+                        
                 except Exception:
                     print("Could not make dsu file, please try again.")
                     break
-
-                else:
+                
+                if not (directory / (file_name + '.dsu')).exists(): # if the file does not exist, create it
+                    dsu_path = create_file(directory, ['-n', file_name])
                     journal = Profile(username, password, bio)
                     journal.save_profile(dsu_path)
                     print("Dsu file created and currently open")
-                    
-                    while True:
-                        print(f"\nCurrently inside {file_name}.dsu, please enter a journal command, or 'Q' to close journal")
+
+                elif (directory / (file_name + '.dsu')).exists(): # if the file exists, open it
+                        print("File already exists, opening file.")
+                        journal = open_dsu_file(directory / (file_name + '.dsu'))
+                        journal.save_profile(directory / (file_name + '.dsu'))
+
+                while True:
+                    print(f"\nCurrently looking at {file_name}.dsu, please enter a journal command, or 'Q' to close journal")
+                    journal_menu_options()
+                    command = input("Enter command: ").lower()
+                    while command not in ["e", "p", "q"]:
+                        print("Invalid command, please try again.")
                         journal_menu_options()
                         command = input("Enter command: ").lower()
-                        while command not in ["e", "p", "q"]:
+                    
+                    args = []
+                    
+                    if command == "e":
+                        print(f"\nYou are now editing {file_name}.dsu, please enter an editing command")
+                        edit_menu_options()
+                        option = input("Enter a command: ")
+                        while option not in edit_menu_options_list:
                             print("Invalid command, please try again.")
-                            journal_menu_options()
-                            command = input("Enter command: ").lower()
-                        
-                        args = []
-                        
-                        if command == "e":
-                            print(f"\n\nYou are now editing {file_name}.dsu, please enter an editing command")
                             edit_menu_options()
                             option = input("Enter a command: ")
-                            while option not in edit_menu_options_list:
-                                print("Invalid command, please try again.")
-                                edit_menu_options()
-                                option = input("Enter a command: ")
-                            args.append(option)
-                            option_input = handle_edit_options(option, journal)
-                            print("Changes Saved")
-                            args.append(option_input)
-                        
-                        elif command == "p":
-                            print(f"You are now looking at {file_name}.dsu, please enter an print command")
-                            print_menu_options()
+                        args.append(option)
+                        option_input = handle_edit_options(option, journal)
+                        print("Changes Saved")
+                        args.append(option_input)
+                    
+                    elif command == "p":
+                        print(f"\nYou are now looking at {file_name}.dsu, please enter an print command")
+                        print_menu_options()
+                        option = input("Enter a command: ")
+                        while option not in print_menu_options_list:
+                            print("Invalid command, please try again.")
+                            edit_menu_options()
                             option = input("Enter a command: ")
-                            while option not in print_menu_options_list:
-                                print("Invalid command, please try again.")
-                                edit_menu_options()
-                                option = input("Enter a command: ")
-                            args.append(option)
-                            option_input = handle_print_options(option, journal)
-                            args.append(option_input)
-    
-                            
-                        if command == 'q':
-                            break
+                        args.append(option)
+                        option_input = handle_print_options(option, journal)
+                        args.append(option_input)
+
                         
-                        edit_dsu_file(journal, dsu_path, command, args)
+                    if command == 'q':
+                        quit_flag = True
+                        break
+                    
+                    edit_dsu_file(journal, dsu_path, command, args)
             else:
-                print('Could not find directory, please enter a valid directory path')
-                return
-            
+                print("Could not find the specified directory, please try again.")
+
         elif option.lower() == 'o':
             while True:
                 try:
@@ -160,54 +171,47 @@ def run_ui(option):
                     print("Could not find the specified directory, or the path provided is not a .dsu file.\nPlease try again.")
 
             while True:
-                        print(f"\nCurrently inside {directory.name}, please enter a journal command, or 'Q' to close journal")
-                        journal_menu_options()
-                        command = input("Enter command: ").lower()
-                        while command not in ["e", "p", "q"]:
-                            print("Invalid command, please try again.")
-                            journal_menu_options()
-                            command = input("Enter command: ").lower()
-                        
-                        args = []
-                        
-                        if command == "e":
-                            print(f"\n\nYou are now editing {directory.name}, please enter an editing command")
-                            edit_menu_options()
-                            option = input("Enter a command: ")
-                            while option not in edit_menu_options_list:
-                                print("Invalid command, please try again.")
-                                edit_menu_options()
-                                option = input("Enter a command: ")
-                            args.append(option)
-                            option_input = handle_edit_options(option, journal)
-                            print("Changes Saved")
-                            args.append(option_input)
-                        
-                        elif command == "p":
-                            print(f"You are now looking at {directory.name}, please enter an print command")
-                            print_menu_options()
-                            option = input("Enter a command: ")
-                            while option not in print_menu_options_list:
-                                print("Invalid command, please try again.")
-                                edit_menu_options()
-                                option = input("Enter a command: ")
-                            args.append(option)
-                            option_input = handle_print_options(option, journal)
-                            args.append(option_input)
-                        
-                        if command == 'q':
-                            break
-                        
-                        edit_dsu_file(journal, directory, command, args)
-
-        else:
-            print("Invalid option, please enter 'C' or 'O'")
-
-    return
-
-
-edit_menu_options_list = ['-usr', '-pwd', '-bio', '-addpost', '-delpost']
-print_menu_options_list = ['-usr', '-pwd', '-bio', '-posts', '-post', '-all']
+                print(f"\nCurrently looking at {directory.name}, please enter a journal command, or 'Q' to close journal")
+                journal_menu_options()
+                command = input("Enter command: ").lower()
+                while command not in ["e", "p", "q"]:
+                    print("Invalid command, please try again.")
+                    journal_menu_options()
+                    command = input("Enter command: ").lower()
+                
+                args = []
+                
+                if command == "e":
+                    print(f"\n\nYou are now editing {directory.name}, please enter an editing command")
+                    edit_menu_options()
+                    option = input("Enter a command: ")
+                    while option not in edit_menu_options_list:
+                        print("Invalid command, please try again.")
+                        edit_menu_options()
+                        option = input("Enter a command: ")
+                    args.append(option)
+                    option_input = handle_edit_options(option, journal)
+                    print("Changes Saved")
+                    args.append(option_input)
+                
+                elif command == "p":
+                    print(f"You are now looking at {directory.name}, please enter an print command")
+                    print_menu_options()
+                    option = input("Enter a command: ")
+                    while option not in print_menu_options_list:
+                        print("Invalid command, please try again.")
+                        edit_menu_options()
+                        option = input("Enter a command: ")
+                    args.append(option)
+                    option_input = handle_print_options(option, journal)
+                    args.append(option_input)
+                
+                if command.lower() == 'q':
+                    quit_flag = True
+                    break 
+                
+                edit_dsu_file(journal, directory, command, args)
+        
 
 def journal_menu_options():
     print("-------------------------------------")
@@ -259,7 +263,7 @@ def handle_print_options(option,journal):
     if option == '-posts':
         return
     if option == '-post':
-        get_all_posts(journal)
+        get_post_indexes_only(journal)
         id = input("Enter the id of the post you would like to view: ")
         return id
     if option == '-all':
@@ -273,5 +277,9 @@ def get_all_posts(journal):
         print(f'{i}: {post["entry"]}')
         i += 1
 
-if __name__ == '__main__':
-    run_admin()
+def get_post_indexes_only(journal):
+    posts = journal.get_posts()
+    i = 0
+    for post in posts:
+        print(f'{i}:')
+        i += 1
