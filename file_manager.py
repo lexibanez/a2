@@ -177,7 +177,7 @@ def admin_mode(journal: Profile, dsu_path: str):
                 command, *args = user_input.split()
                 break
             else:
-                print("ERROR")
+                print("enter a dsu.file")
 
         if command.lower() == 'q':
             break
@@ -217,8 +217,11 @@ def admin_mode(journal: Profile, dsu_path: str):
             if '-post' in args:
                 try:
                     id = get_argument_value(args, '-post')
-                    print(journal.get_posts()[int(id)]["entry"])
-                except IndexError:
+                    if id:
+                        print(journal.get_posts()[int(id)]["entry"])
+                    else:
+                        print("Provide a number")
+                except IndexError or ValueError:
                     print("Index out of range")
                     continue
             if '-all' in args:
@@ -239,5 +242,5 @@ def get_all_posts(journal):
     posts = journal.get_posts()
     i = 0
     for post in posts:
-        print(f'{i}: {post["entry"]}')
+        print(f'{i}: {post["entry"]}\nTimestamp: {post["timestamp"]}')
         i += 1
